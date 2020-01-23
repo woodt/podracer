@@ -80,7 +80,7 @@ class Analyzer(object):
                     elif self.verbose:
                         self.msg(k, url, indent=2)
         if not self.verbose and url_checks:
-            self.msg("Dataset", label, title, "has distribution problems:")
+            self.msg("Dataset", label, ds['title'], "has distribution problems:")
             for url_check in url_checks:
                 self.msg(url_check, indent=1)
 

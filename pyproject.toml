@@ -6,11 +6,11 @@ authors = ["Tom Wood <tom.wood@civicactions.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.7"
-requests = {extras = ["secure"], version = "^2.22.0"}
+requests = "^2.22.0"
 jsonschema = "^3.2.0"
 click = "^7.0"
 numpy = "^1.18.1"
-fuzzywuzzy = {extras = ["speedups"], version = "^0.17.0"}
+fuzzywuzzy = "^0.17.0"
 scikit-learn = "^0.22.1"
 python-levenshtein = "^0.12.0"
 

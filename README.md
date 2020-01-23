@@ -3,7 +3,7 @@
 ## Usage
 
 ```
-$ podracer https://healhdata.gov/data.json
+$ podracer https://healthdata.gov/data.json
 
 $ podracer --help
 Usage: cli.py [OPTIONS] URL

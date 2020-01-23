@@ -183,7 +183,7 @@ class Analyzer(object):
 @click.command()
 @click.option("--verbose", is_flag=True, help='Show more details about datasets and distributions')
 @click.option("--link-check", is_flag=True, help='Check dataset landing page and distribution URLs')
-@click.option("--keyword-cluster", is_flag=True, help='Enable (VERY) keyword cluster analysis.  Slow for large # of keywords.')
+@click.option("--keyword-cluster", is_flag=True, help='Enable (VERY) experimental keyword clustering.  Not great, and slow for large # of keywords.')
 @click.argument("url")
 def main(url, verbose, link_check, keyword_cluster):
     dj = requests.get(url, verify=False).json()

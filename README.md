@@ -2,7 +2,7 @@
 
 ## Installation
 
-Requires Python 3.6 or later, and pip 19.2 or later.
+Requires Python 3.7 or later, and pip 19.2 or later.
 
 ```
 $ pip install git+https://github.com/woodt/podracer.git#egg=podracer

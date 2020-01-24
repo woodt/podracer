@@ -10,6 +10,7 @@ class Analyzer(object):
 
     def __init__(self, verbose=False, link_check=False):
         self.by_identifier = defaultdict(list)
+        self.by_title = defaultdict(list)
         self.keyword_counts = defaultdict(int)
         self.by_publisher = defaultdict(list)
         self.license_counts = defaultdict(int)
@@ -24,7 +25,7 @@ class Analyzer(object):
         datasets = dj['dataset']
         n_datasets = len(datasets)
         
-        self.msg('Analysis of', dj['@id'])
+        self.msg('Analysis of', dj.get('@id', '<missing @id>'))
         self.msg(n_datasets, 'datasets', indent=1)
         self.nl()
 
@@ -44,6 +45,7 @@ class Analyzer(object):
         bureau = ds.get("bureauCode", ["NONE"])
         self.bureau_counts[tuple(bureau)] += 1
         self.by_identifier[identifier].append(ds)
+        self.by_title[title].append(ds)
         self.publish(ds, ds["publisher"])
   
         if self.verbose:
@@ -93,16 +95,24 @@ class Analyzer(object):
 
         self.print_messages()
         self.report_duplicate_ids()
+        self.report_duplicate_titles()
         self.report_questionable_keywords()
         self.report_counts()
 
     def report_duplicate_ids(self):
         print("Duplicate Identifiers")
-        for identifier, ds in self.by_identifier.items():
+        for identifier, ds in sorted(self.by_identifier.items(), key=lambda item: item[0]):
             if len(ds) > 1:
                 print("  Identifer:", identifier)
                 for d in ds:
                     print("    Dataset:", d["title"])
+        print("")
+
+    def report_duplicate_titles(self):
+        print("Duplicate Titles")
+        for title, ds in sorted(self.by_title.items(), key=lambda item: item[0]):
+            if len(ds) > 1:
+                print("  ", title)
         print("")
 
     def report_questionable_keywords(self):
@@ -148,7 +158,7 @@ class Analyzer(object):
 
     def msg(self, *s, **kwargs):
         indent = kwargs.get('indent', 0)
-        self.messages.append((" " * indent) + " ".join(str(s0) for s0 in s))
+        self.messages.append(("  " * indent) + " ".join(str(s0) for s0 in s))
     
     def nl(self):
         self.messages.append("")

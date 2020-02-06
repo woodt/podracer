@@ -8,6 +8,13 @@ Requires Python 3.7 or later, and pip 19.2 or later.
 $ pip install git+https://github.com/woodt/podracer.git#egg=podracer
 ```
 
+OR
+
+```
+$ docker build -t podracer:latest .
+$ docker run podracer:latest ...
+```
+
 ## Usage
 
 ```

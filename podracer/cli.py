@@ -24,9 +24,11 @@ class Analyzer(object):
         """Analyze a data.json object"""
         datasets = dj['dataset']
         n_datasets = len(datasets)
+        n_distributions = sum(len(ds.get('distribution', [])) for ds in datasets)
         
         self.msg('Analysis of', dj.get('@id', '<missing @id>'))
         self.msg(n_datasets, 'datasets', indent=1)
+        self.msg(n_distributions, 'distributions', indent=1)
         self.nl()
 
         with click.progressbar(enumerate(datasets), 
@@ -111,8 +113,9 @@ class Analyzer(object):
     def report_duplicate_titles(self):
         print("Duplicate Titles")
         for title, ds in sorted(self.by_title.items(), key=lambda item: item[0]):
-            if len(ds) > 1:
-                print("  ", title)
+            n_dups = len(ds)
+            if n_dups > 1:
+                print("  ", title, "[{} duplicates]".format(n_dups))
         print("")
 
     def report_questionable_keywords(self):
@@ -156,6 +159,11 @@ class Analyzer(object):
             print("  {0} {1}".format(", ".join(bureau), self.bureau_counts[bureau]))
         print("")
 
+        print("Publisher counts")
+        for publisher, ds in sorted(self.by_publisher.items(), key=lambda item: item[0]):
+            print("  {0} {1}".format(' > '.join(publisher), len(ds)))
+        print("")
+
     def msg(self, *s, **kwargs):
         indent = kwargs.get('indent', 0)
         self.messages.append(("  " * indent) + " ".join(str(s0) for s0 in s))
@@ -196,7 +204,9 @@ class Analyzer(object):
 @click.option("--keyword-cluster", is_flag=True, help='Enable (VERY) experimental keyword clustering.  Not great, and slow for large # of keywords.')
 @click.argument("url")
 def main(url, verbose, link_check, keyword_cluster):
-    dj = requests.get(url, verify=False).json()
+    resp = requests.get(url, verify=False)
+    resp.raise_for_status()
+    dj = resp.json()
     analyzer = Analyzer(verbose=verbose, 
                         link_check=link_check)
     analyzer.analyze(dj)

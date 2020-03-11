@@ -16,6 +16,8 @@ class Analyzer(object):
         self.license_counts = defaultdict(int)
         self.program_counts = defaultdict(int)
         self.bureau_counts = defaultdict(int)
+        self.contact_counts = defaultdict(int)
+        self.access_level_counts = defaultdict(int)
         self.messages = []
         self.link_check = link_check
         self.verbose = verbose
@@ -39,13 +41,17 @@ class Analyzer(object):
 
     def analyze_dataset(self, ds, label):
         title = ds["title"]
-        identifier = ds["identifier"]
+        identifier = ds.get("identifier", "NONE")
         license = ds.get("license", "NONE")
         self.license_counts[license] += 1
         program = ds.get("programCode", ["NONE"])
         self.program_counts[tuple(program)] += 1
         bureau = ds.get("bureauCode", ["NONE"])
         self.bureau_counts[tuple(bureau)] += 1
+        access_level = ds.get("accessLevel", "NONE")
+        self.access_level_counts[access_level] += 1
+        contact = ds.get("contactPoint", "NONE")
+        self.contact_counts[tuple(contact)] += 1
         self.by_identifier[identifier].append(ds)
         self.by_title[title].append(ds)
         self.publish(ds, ds["publisher"])
@@ -157,6 +163,16 @@ class Analyzer(object):
         print("Bureau counts")
         for bureau in sorted(self.bureau_counts.keys()):
             print("  {0} {1}".format(", ".join(bureau), self.bureau_counts[bureau]))
+        print("")
+
+        print("Access Level counts")
+        for access_level in sorted(self.access_level_counts.keys()):
+            print("  {0} {1}".format(access_level, self.access_level_counts[access_level]))
+        print("")
+        
+        print("Contact Point counts")
+        for contact in sorted(self.contact_counts.keys()):
+            print("  {0} {1}".format(" ".join(contact), self.contact_counts[contact]))
         print("")
 
         print("Publisher counts")

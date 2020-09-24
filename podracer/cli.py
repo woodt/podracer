@@ -1,9 +1,17 @@
-import click
-from collections import defaultdict
-import requests
 import time
+from collections import defaultdict
+
+import click
+import requests
 
 from .affinity import affinity
+
+
+def make_contact(contact):
+    fn = contact.get("fn", "")
+    email = contact.get("hasEmail", "")
+    return [fn, email]
+
 
 class Analyzer(object):
     """Analyze data.json objects for quality."""
@@ -24,18 +32,18 @@ class Analyzer(object):
 
     def analyze(self, dj):
         """Analyze a data.json object"""
-        datasets = dj['dataset']
+        datasets = dj["dataset"]
         n_datasets = len(datasets)
-        n_distributions = sum(len(ds.get('distribution', [])) for ds in datasets)
-        
-        self.msg('Analysis of', dj.get('@id', '<missing @id>'))
-        self.msg(n_datasets, 'datasets', indent=1)
-        self.msg(n_distributions, 'distributions', indent=1)
+        n_distributions = sum(len(ds.get("distribution", [])) for ds in datasets)
+
+        self.msg("Analysis of", dj.get("@id", "<missing @id>"))
+        self.msg(n_datasets, "datasets", indent=1)
+        self.msg(n_distributions, "distributions", indent=1)
         self.nl()
 
-        with click.progressbar(enumerate(datasets), 
-                               length=n_datasets,
-                               label='Analyzing datasets') as bar:
+        with click.progressbar(
+            enumerate(datasets), length=n_datasets, label="Analyzing datasets"
+        ) as bar:
             for index, dataset in bar:
                 self.analyze_dataset(dataset, str(index))
 
@@ -50,30 +58,31 @@ class Analyzer(object):
         self.bureau_counts[tuple(bureau)] += 1
         access_level = ds.get("accessLevel", "NONE")
         self.access_level_counts[access_level] += 1
-        contact = ds.get("contactPoint", "NONE")
+        contact = make_contact(ds.get("contactPoint", "NONE"))
         self.contact_counts[tuple(contact)] += 1
         self.by_identifier[identifier].append(ds)
         self.by_title[title].append(ds)
         self.publish(ds, ds["publisher"])
-  
+
         if self.verbose:
             self.msg("Dataset", label, title)
- 
+
         landing_page = ds.get("landingPage", None)
         if landing_page and self.link_check:
             landing_page_check = self.check(landing_page)
             if landing_page_check:
-                self.msg("Dataset", label, title, "- landingPage check", landing_page_check)
+                self.msg(
+                    "Dataset", label, title, "- landingPage check", landing_page_check
+                )
 
         keywords = ds.get("keyword", [])
         for keyword in keywords:
             self.keyword_counts[keyword] += 1
         self.analyze_distributions(ds, label)
 
-    
     def analyze_distributions(self, ds, label):
         url_checks = []
-        for d in ds.get('distribution', []):
+        for d in ds.get("distribution", []):
             if self.verbose:
                 # sigh
                 title = d.get("title", d.get("Title", ""))
@@ -90,7 +99,7 @@ class Analyzer(object):
                     elif self.verbose:
                         self.msg(k, url, indent=2)
         if not self.verbose and url_checks:
-            self.msg("Dataset", label, ds['title'], "has distribution problems:")
+            self.msg("Dataset", label, ds["title"], "has distribution problems:")
             for url_check in url_checks:
                 self.msg(url_check, indent=1)
 
@@ -109,7 +118,9 @@ class Analyzer(object):
 
     def report_duplicate_ids(self):
         print("Duplicate Identifiers")
-        for identifier, ds in sorted(self.by_identifier.items(), key=lambda item: item[0]):
+        for identifier, ds in sorted(
+            self.by_identifier.items(), key=lambda item: item[0]
+        ):
             if len(ds) > 1:
                 print("  Identifer:", identifier)
                 for d in ds:
@@ -129,7 +140,7 @@ class Analyzer(object):
             try:
                 s.encode("latin-1")
                 return True
-            except:
+            except Exception:
                 return False
 
         print("Questionable Keywords")
@@ -167,23 +178,27 @@ class Analyzer(object):
 
         print("Access Level counts")
         for access_level in sorted(self.access_level_counts.keys()):
-            print("  {0} {1}".format(access_level, self.access_level_counts[access_level]))
+            print(
+                "  {0} {1}".format(access_level, self.access_level_counts[access_level])
+            )
         print("")
-        
+
         print("Contact Point counts")
         for contact in sorted(self.contact_counts.keys()):
             print("  {0} {1}".format(" ".join(contact), self.contact_counts[contact]))
         print("")
 
         print("Publisher counts")
-        for publisher, ds in sorted(self.by_publisher.items(), key=lambda item: item[0]):
-            print("  {0} {1}".format(' > '.join(publisher), len(ds)))
+        for publisher, ds in sorted(
+            self.by_publisher.items(), key=lambda item: item[0]
+        ):
+            print("  {0} {1}".format(" > ".join(publisher), len(ds)))
         print("")
 
     def msg(self, *s, **kwargs):
-        indent = kwargs.get('indent', 0)
+        indent = kwargs.get("indent", 0)
         self.messages.append(("  " * indent) + " ".join(str(s0) for s0 in s))
-    
+
     def nl(self):
         self.messages.append("")
 
@@ -195,14 +210,18 @@ class Analyzer(object):
                 return "{0} - HTTP ERROR {1}".format(url, r.status_code)
             else:
                 return None
-        except requests.exceptions.SSLError as e:
+        except requests.exceptions.SSLError:
             return None
-        except requests.exceptions.Timeout as e:
+        except requests.exceptions.Timeout:
             return "{0} - REQUEST TIMEOUT".format(url)
-        except requests.exceptions.ConnectionError as e:
+        except requests.exceptions.ConnectionError:
             return "{0} - CONNECTION TIMEOUT".format(url)
 
     def publisher_path(self, publisher):
+        # this shouldn't happen, but I've found some data.json in the world
+        # where publishers are strings :-(
+        if isinstance(publisher, str):
+            return [publisher]
         sub_organizations = publisher.get("subOrganizationOf", None)
         name = publisher["name"]
         if not sub_organizations:
@@ -214,17 +233,28 @@ class Analyzer(object):
         path = tuple(reversed(self.publisher_path(publisher)))
         self.by_publisher[path].append(ds)
 
+
 @click.command()
-@click.option("--verbose", is_flag=True, help='Show more details about datasets and distributions')
-@click.option("--link-check", is_flag=True, help='Check dataset landing page and distribution URLs')
-@click.option("--keyword-cluster", is_flag=True, help='Enable (VERY) experimental keyword clustering.  Not great, and slow for large # of keywords.')
+@click.option(
+    "--verbose", is_flag=True, help="Show more details about datasets and distributions"
+)
+@click.option(
+    "--link-check",
+    is_flag=True,
+    help="Check dataset landing page and distribution URLs",
+)
+@click.option(
+    "--keyword-cluster",
+    is_flag=True,
+    help="Enable (VERY) experimental keyword clustering."
+    "  Not great, and slow for large # of keywords.",
+)
 @click.argument("url")
 def main(url, verbose, link_check, keyword_cluster):
     resp = requests.get(url, verify=False)
     resp.raise_for_status()
     dj = resp.json()
-    analyzer = Analyzer(verbose=verbose, 
-                        link_check=link_check)
+    analyzer = Analyzer(verbose=verbose, link_check=link_check)
     analyzer.analyze(dj)
     analyzer.print_report()
 
@@ -234,6 +264,7 @@ def main(url, verbose, link_check, keyword_cluster):
         for exemplar in sorted(clusters.keys()):
             print('  {0}: "{1}"'.format(exemplar, '", "'.join(clusters[exemplar])))
         print("")
+
 
 if __name__ == "__main__":
     main()

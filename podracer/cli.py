@@ -249,9 +249,10 @@ class Analyzer(object):
     help="Enable (VERY) experimental keyword clustering."
     "  Not great, and slow for large # of keywords.",
 )
+@click.option("--no-verify", is_flag=True, help="Disable SSL verification")
 @click.argument("url")
-def main(url, verbose, link_check, keyword_cluster):
-    resp = requests.get(url, verify=False)
+def main(url, verbose, link_check, keyword_cluster, no_verify):
+    resp = requests.get(url, verify=not no_verify)
     resp.raise_for_status()
     dj = resp.json()
     analyzer = Analyzer(verbose=verbose, link_check=link_check)

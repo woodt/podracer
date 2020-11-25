@@ -1,3 +1,4 @@
+import json
 import time
 from collections import defaultdict
 
@@ -36,10 +37,21 @@ class Analyzer(object):
         n_datasets = len(datasets)
         n_distributions = sum(len(ds.get("distribution", [])) for ds in datasets)
 
+        # check for "ED CKAN" scraped metadata additions
+
         self.msg("Analysis of", dj.get("@id", "<missing @id>"))
         self.msg(n_datasets, "datasets", indent=1)
         self.msg(n_distributions, "distributions", indent=1)
         self.nl()
+
+        if "source" in dj or "collection" in dj:
+            n_sources = len(dj.get("source", []))
+            n_collections = len(dj.get("collection", []))
+
+            self.msg("Enhanced scraping metadata")
+            self.msg(n_sources, "sources", indent=1)
+            self.msg(n_collections, "collections", indent=1)
+            self.nl()
 
         with click.progressbar(
             enumerate(datasets), length=n_datasets, label="Analyzing datasets"
@@ -250,11 +262,30 @@ class Analyzer(object):
     "  Not great, and slow for large # of keywords.",
 )
 @click.option("--no-verify", is_flag=True, help="Disable SSL verification")
-@click.argument("url")
-def main(url, verbose, link_check, keyword_cluster, no_verify):
-    resp = requests.get(url, verify=not no_verify)
-    resp.raise_for_status()
-    dj = resp.json()
+@click.option("--url", help="URL to data.json endpoint")
+@click.option(
+    "-f",
+    "--file",
+    "file_",
+    type=click.File("r"),
+    help="Path to local data.json format file",
+)
+def main(url, file_, verbose, link_check, keyword_cluster, no_verify):
+    # must have URL or file, but not both
+    if not (url or file_):
+        raise click.ClickException("must specify either --url or --file")
+    if url and file_:
+        raise click.ClickException("can't specify both --url and --file")
+
+    dj = {}
+
+    if url:
+        resp = requests.get(url, verify=not no_verify)
+        resp.raise_for_status()
+        dj = resp.json()
+    if file_:
+        dj = json.load(file_)
+
     analyzer = Analyzer(verbose=verbose, link_check=link_check)
     analyzer.analyze(dj)
     analyzer.print_report()

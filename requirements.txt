@@ -79,7 +79,7 @@ scikit-learn==0.22.2.post1; python_version >= "3.5" \
     --hash=sha256:83fc104a799cb340054e485c25dfeee712b36f5638fb374eba45a9db490f16ff \
     --hash=sha256:1bf45e62799b6938357cfce19f72e3751448c4b27010e4f98553da669b5bbd86 \
     --hash=sha256:672ea38eb59b739a8907ec063642b486bcb5a2073dda5b72b7983eeaf1fd67c1
-scipy==1.6.1; python_version >= "3.7" \
+scipy==1.8.0; python_version >= "3.7" \
     --hash=sha256:a15a1f3fc0abff33e792d6049161b7795909b40b97c6cc2934ed54384017ab76 \
     --hash=sha256:e79570979ccdc3d165456dd62041d9556fb9733b86b4b6d818af7a0afc15f092 \
     --hash=sha256:a423533c55fec61456dedee7b6ee7dce0bb6bfa395424ea374d25afa262be261 \

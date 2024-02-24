@@ -1,4 +1,4 @@
-FROM python:3.7
+FROM python:3.13.0a4
 
 RUN mkdir /app
 COPY pyproject.toml /app

@@ -19,13 +19,13 @@ idna==2.10; python_version >= "2.7" and python_full_version < "3.0.0" or python_
 importlib-metadata==3.10.0; python_version >= "3.6" and python_version < "3.8" \
     --hash=sha256:d2d46ef77ffc85cbf7dac7e81dd663fde71c45326131bea8033b9bad42268ebe \
     --hash=sha256:c9db46394197244adf2f0b08ec5bc3cf16757e9590b02af1fca085c16c0d600a
-joblib==1.0.1; python_version >= "3.6" \
+joblib==1.1.1; python_version >= "3.6" \
     --hash=sha256:feeb1ec69c4d45129954f1b7034954241eedfd6ba39b5e9e4b6883be3332d5e5 \
     --hash=sha256:9c17567692206d2f3fb9ecf5e991084254fe631665c450b443761c4186a613f7
 jsonschema==3.2.0 \
     --hash=sha256:4e5b3cf8216f577bee9ce139cbe72eca3ea4f292ec60928ff24758ce626cd163 \
     --hash=sha256:c8a85b28d377cc7737e46e2d9f2b4f44ee3c0e1deac6bf46ddefc7187d30797a
-numpy==1.20.2; python_version >= "3.7" \
+numpy==1.22.2; python_version >= "3.7" \
     --hash=sha256:e9459f40244bb02b2f14f6af0cd0732791d72232bbb0dc4bab57ef88e75f6935 \
     --hash=sha256:a8e6859913ec8eeef3dbe9aed3bf475347642d1cdd6217c30f28dee8903528e6 \
     --hash=sha256:9cab23439eb1ebfed1aaec9cd42b7dc50fc96d5cd3147da348d9161f0501ada5 \
@@ -57,7 +57,7 @@ python-levenshtein==0.12.2 \
 requests==2.25.1; (python_version >= "2.7" and python_full_version < "3.0.0") or (python_full_version >= "3.5.0") \
     --hash=sha256:c210084e36a42ae6b9219e00e48287def368a26d03a048ddad7bfee44f75871e \
     --hash=sha256:27973dd4a904a4f13b263a19c866c13b92a39ed1c964655f025f3f8d3d75b804
-scikit-learn==0.22.2.post1; python_version >= "3.5" \
+scikit-learn==0.24.2; python_version >= "3.5" \
     --hash=sha256:57538d138ba54407d21e27c306735cbd42a6aae0df6a5a30c7a6edde46b0017d \
     --hash=sha256:267ad874b54c67b479c3b45eb132ef4a56ab2b27963410624a413a4e2a3fc388 \
     --hash=sha256:8ed66ab27b3d68e57bb1f315fc35e595a5c4a1f108c3420943de4d18fc40e615 \
@@ -79,7 +79,7 @@ scikit-learn==0.22.2.post1; python_version >= "3.5" \
     --hash=sha256:83fc104a799cb340054e485c25dfeee712b36f5638fb374eba45a9db490f16ff \
     --hash=sha256:1bf45e62799b6938357cfce19f72e3751448c4b27010e4f98553da669b5bbd86 \
     --hash=sha256:672ea38eb59b739a8907ec063642b486bcb5a2073dda5b72b7983eeaf1fd67c1
-scipy==1.6.1; python_version >= "3.7" \
+scipy==1.10.0rc1; python_version >= "3.7" \
     --hash=sha256:a15a1f3fc0abff33e792d6049161b7795909b40b97c6cc2934ed54384017ab76 \
     --hash=sha256:e79570979ccdc3d165456dd62041d9556fb9733b86b4b6d818af7a0afc15f092 \
     --hash=sha256:a423533c55fec61456dedee7b6ee7dce0bb6bfa395424ea374d25afa262be261 \
